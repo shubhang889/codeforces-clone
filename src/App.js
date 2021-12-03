@@ -4,6 +4,7 @@ import {useEffect, useState} from 'react';
 
 
 let totalContestsList = [] ;
+let showFav = false ;
 
 function convertDate(sec) {
     return new Date(sec*1000).toString();
@@ -11,16 +12,6 @@ function convertDate(sec) {
 
 function convertSectoMins(mins) {
     return (mins/60) ;
-}
-
-function filterFavourites() {
-     RESULT.filter((res => res.isFavourite === true)).map((obj) => (
-        <div className="app-page-details-ind" key={obj.id}>
-            <h3>{obj.name}</h3>
-            <p>Duration : {convertSectoMins(obj.durationSeconds)} Minutes</p>
-            <p>start time : {convertDate(obj.startTimeSeconds)}</p>
-        </div>
-    )) ;
 }
 
 
@@ -31,7 +22,7 @@ function App() {
     const[query, setQuery] = useState("") ;
     const[contestType,setContestType] = useState("CF") ;
     const[pageNo, setPageNo] = useState(1) ;
-    const[contestPhase, setContestPhase] = useState("ONGOING") ;
+    const[contestPhase, setContestPhase] = useState("BEFORE") ;
 
     useEffect(() => {
         console.log('called when aoi called');
@@ -48,8 +39,14 @@ function App() {
                 else {
                     totalContestsList = [] ;
                 }
-                console.log(totalContestsList.slice(0,pageSize), 'uiArray') ;
-                setUiArray(totalContestsList.slice(0,pageSize)) ;
+                totalContestsList.forEach((obj) => {
+                    obj["isFavourite"]=false ;
+                })
+                console.log(totalContestsList, "totalContestsList") ;
+                let filtered = totalContestsList.filter((obj) => obj.phase===contestPhase && obj.type===contestType) ;
+            
+                console.log(filtered.slice(0,pageSize), 'uiArray') ;
+                setUiArray(filtered.slice(0,pageSize)) ;
 
             } catch (error) {
                 console.log("error", error);
@@ -127,7 +124,31 @@ function App() {
         let filtered = totalContestsList.filter((obj) => (obj.type===contestType && obj.phase===contestPhase)).slice((pageNo-1)*pageSize,pageSize*pageNo) ;
         setUiArray(filtered) ;
         
-    }, [pageNo])
+    }, [pageNo]) ;
+    
+    function handleFavouriteClick(obj) {
+        console.log(obj.isFavourite) ;
+        obj.isFavourite= !obj.isFavourite ;
+        console.log(obj.isFavourite, "after") ;
+        console.log(uiArray,": uiARRAY") ;
+
+        let filtered = uiArray.slice() ;
+        setUiArray(filtered) ;
+    }
+
+    function handleShowFavourite(event) {
+        showFav = !showFav ;
+        if(showFav) {
+            let filtered = totalContestsList.filter((obj) => obj.isFavourite===true) ;
+
+            setUiArray(filtered.slice(0,pageSize)) ;
+        } else {
+            let filtered = totalContestsList.filter((obj) => (obj.type===contestType && obj.phase===contestPhase)) ;
+
+            setUiArray(filtered.slice(0,pageSize)) ;
+        }
+    }
+
     
    
   return (
@@ -141,19 +162,24 @@ function App() {
             </div>
         </header>
          <div> 
-            <div className="App-page-Dropdown-Search">
-                <input placeholder="Search" onChange={handleQueryChange} />
-                <select id="dropdown" onChange={handleTypeChange}>
-                    <option value="CF">CF</option>
-                    <option value="IOI">IOI</option>
-                    <option value="ICPC">ICPC</option>
-                </select>
-                <select id="dropdown" onChange={handlePhaseChange}>
-                    <option value="FINISHED">FINISHED</option>
-                    <option value="CODING">ONGOING</option>
-                    <option value="BEFORE">UPCOMING</option>
-                </select>
-                <button className="btn-favourite" onClick={filterFavourites()}>Show Favourites</button>
+            <div className="app-page-dropdown-search">
+                <div>
+                    <input className="search-bar" placeholder="Search" onChange={handleQueryChange} />
+                </div>
+                <div className="app-page-dropdown">
+                    <h4>Filters:</h4>
+                    <select id="dropdown" onChange={handleTypeChange}>
+                        <option value="CF">CF</option>
+                        <option value="IOI">IOI</option>
+                        <option value="ICPC">ICPC</option>
+                    </select>
+                    <select id="dropdown" onChange={handlePhaseChange}>
+                        <option value="BEFORE">UPCOMING</option>
+                        <option value="FINISHED">FINISHED</option>
+                        <option value="CODING">ONGOING</option>
+                    </select>
+                    {showFav==false ? <button className="btn-show-fav" onClick={handleShowFavourite}>Show Favourites</button> : <button className="btn-show-fav" onClick={handleShowFavourite}>Show All</button> }
+                </div>
             </div>
 
             {uiArray.length > 0 ? <div className="app-page">
@@ -164,6 +190,9 @@ function App() {
                             <p>Duration : {convertSectoMins(obj.durationSeconds)} Minutes</p>
                             <p>start time : {convertDate(obj.startTimeSeconds)}</p>
                             <p>Type: {obj.type}</p>
+                            <p>Phase: {obj.phase}</p> 
+                            {obj.isFavourite===false ? <button onClick={() => handleFavouriteClick(obj)} className="btn-mark-fav">Mark as Favourite</button> : 
+                            <button onClick={() => handleFavouriteClick(obj)} className="btn-remove-fav">Remove Favourite</button> }
                         </div>
                     ))
                 }

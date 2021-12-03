@@ -1,4 +1,16 @@
 
+select {
+  /* width : 100px ; */
+  padding: 10px;
+
+}
+
+input {
+  padding: 10px;
+  width: 200px;
+  
+}
+
 
 .App-header {
   min-height: 70%;
@@ -21,13 +33,19 @@
   font-weight: 150;
 }
 
-.App-page-Dropdown-Search {
+.app-page-dropdown-search {
     display: flex;
     flex-wrap: nowrap;
-    justify-content:space-around ;
+    justify-content:space-between ;
     /* justify-content: center; */
     align-items: center;
     margin: 10px;
+}
+
+.app-page-dropdown {
+  display: flex;
+  justify-content: space-between;
+  width: 40%;
 }
 
 .app-page {
@@ -51,7 +69,7 @@
   position: fixed;
   bottom: 0;
   width: 100%;
-  /* background-color: grey; */
+  background-color: white;
   display: flex;
   flex-wrap: nowrap;
   justify-content: right;
@@ -75,4 +93,16 @@ button {
 
 .btn-favourite {
   background-color: seagreen;
+}
+
+.btn-mark-fav {
+  background-color: #1ba94c;
+}
+
+.btn-remove-fav {
+  background-color: red;
+}
+
+.btn-show-fav {
+  background-color: #1ba94c;
 }
