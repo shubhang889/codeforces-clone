@@ -58,6 +58,7 @@ function App() {
     }, []);  
 
     const debouncedChange = debounce(function handleQueryChange(event) {
+        
         let filtered = totalContestsList.filter((obj) => {
             if (event.target.value === '') {
                 return obj;
