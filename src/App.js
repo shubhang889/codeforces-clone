@@ -152,12 +152,12 @@ function App() {
   }
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <div className="App-header-codeforces">Codeforces</div>
-        <div className="App-header-contests">Contests</div>
+    <div className="app">
+      <header className="app-header">
+        <div className="app-header-codeforces">Codeforces</div>
+        <div className="app-header-contests">Contests</div>
       </header>
-      <div>
+      <div className="app-page-main">
         <div className="app-page-dropdown-search">
           <div>
             <input
@@ -178,7 +178,7 @@ function App() {
               <option value="FINISHED">FINISHED</option>
               <option value="CODING">ONGOING</option>
             </select>
-            {showFav == false ? (
+            {showFav === false ? (
               <button className="btn-show-fav" onClick={handleShowFavourite}>
                 Show Favourites
               </button>
@@ -200,7 +200,6 @@ function App() {
                 </p>
                 <p>start time : {convertDate(obj.startTimeSeconds)}</p>
                 <p>Type: {obj.type}</p>
-                <p>Phase: {obj.phase}</p>
                 {obj.isFavourite === false ? (
                   <button
                     onClick={() => handleFavouriteClick(obj)}
