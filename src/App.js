@@ -1,6 +1,8 @@
 import './App.css';
-import {RESULT} from './constant';
+
 import {useEffect, useState} from 'react';
+import _, {debounce} from 'lodash';
+ 
 
 
 let totalContestsList = [] ;
@@ -55,8 +57,7 @@ function App() {
         fetchData();
     }, []);  
 
-    function handleQueryChange(event) {
-        
+    const debouncedChange = debounce(function handleQueryChange(event) {
         let filtered = totalContestsList.filter((obj) => {
             if (event.target.value === '') {
                 return obj;
@@ -67,7 +68,7 @@ function App() {
         }) ;
         setUiArray(filtered.slice(0,pageSize)) ;
 
-    }
+    }, 500)
  
     function handleTypeChange(event) {
         setPageNo(1) ;
@@ -164,7 +165,7 @@ function App() {
          <div> 
             <div className="app-page-dropdown-search">
                 <div>
-                    <input className="search-bar" placeholder="Search" onChange={handleQueryChange} />
+                    <input className="search-bar" placeholder="Search" onChange={debouncedChange} />
                 </div>
                 <div className="app-page-dropdown">
                     <h4>Filters:</h4>
