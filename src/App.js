@@ -29,8 +29,10 @@ function App() {
     const[uiArray, setUiArray] = useState([]) ;
     const[pageSize, setPageSize] = useState(10) ;
     const[query, setQuery] = useState("") ;
-    const[contestType,setContestType] = useState("ALL") ;
+    const[contestType,setContestType] = useState("CF") ;
     const[pageNo, setPageNo] = useState(1) ;
+    const[contestPhase, setContestPhase] = useState("ONGOING") ;
+
     useEffect(() => {
         console.log('called when aoi called');
         const url = "https://codeforces.com/api/contest.list";
@@ -73,20 +75,15 @@ function App() {
     function handleTypeChange(event) {
         setPageNo(1) ;
         setContestType(event.target.value) ;
-
-        
     }
 
     useEffect(() => {
-        if(contestType==="ALL") {
-            
-            setUiArray(totalContestsList.slice(0,pageSize));
-            
-        } else { 
+         
         
-            let filtered = totalContestsList.filter((obj) => obj.type===contestType) ;
-            setUiArray(filtered.slice(0,pageSize)) ;
-        }
+        let filtered = totalContestsList.filter((obj) => obj.type===contestType && obj.phase===contestPhase) ;
+
+        setUiArray(filtered.slice(0,pageSize)) ;
+        
     }, [contestType]);
 
     function handlePageSizeChange(event) {
@@ -94,12 +91,25 @@ function App() {
     }
     
     useEffect(() => {
-        if(contestType==="ALL") {
-            setUiArray(totalContestsList.slice(0,pageSize)) ;
-        } else {
-            setUiArray(totalContestsList.filter((obj) => obj.type===contestType).slice(0,pageSize)) ;
-        }
+        
+        setUiArray(totalContestsList.filter((obj) => (obj.type===contestType && obj.phase===contestPhase)).slice(0,pageSize));
+        
     }, [pageSize]);
+
+    function handlePhaseChange(event) {
+        setPageNo(1) ;
+        console.log("PhaseChange", pageNo) ;
+        setContestPhase(event.target.value) ;
+        console.log("Phase:", contestPhase) ;
+    }
+
+    useEffect(() => {
+        let filtered = totalContestsList.filter((obj) => obj.type===contestType && obj.phase===contestPhase)
+        
+        setUiArray(filtered.slice(0,pageSize)) ;
+        console.log("uiArray:",uiArray) ;
+        
+    }, [contestPhase]) ;
 
     function previousPage() {
         if(pageNo>1) {
@@ -113,15 +123,10 @@ function App() {
     useEffect(() => {
         console.log('pageNo.', pageNo) ;
         console.log("pageSize:",pageSize) ;
-        if(contestType==="ALL") {
-            let filtered = totalContestsList.slice((pageNo-1)*(pageSize),pageSize*pageNo) ;
-            console.log("filtered1", filtered) ;
-            setUiArray(filtered) ;
-        } else {
-            let filtered = totalContestsList.filter((obj) => obj.type===contestType).slice((pageNo-1)*pageSize,pageSize*pageNo) ;
-            console.log("filtered2", filtered) ;
-            setUiArray(filtered) ;
-        } 
+        
+        let filtered = totalContestsList.filter((obj) => (obj.type===contestType && obj.phase===contestPhase)).slice((pageNo-1)*pageSize,pageSize*pageNo) ;
+        setUiArray(filtered) ;
+        
     }, [pageNo])
     
    
@@ -135,22 +140,26 @@ function App() {
                 Contests
             </div>
         </header>
-        {uiArray.length > 0 ? <div className="app-page"> 
+         <div> 
             <div className="App-page-Dropdown-Search">
                 <input placeholder="Search" onChange={handleQueryChange} />
                 <select id="dropdown" onChange={handleTypeChange}>
-                    <option value="ALL">ALL</option>
                     <option value="CF">CF</option>
                     <option value="IOI">IOI</option>
                     <option value="ICPC">ICPC</option>
                 </select>
-                <button onClick={filterFavourites()}>Show Favourites</button>
+                <select id="dropdown" onChange={handlePhaseChange}>
+                    <option value="FINISHED">FINISHED</option>
+                    <option value="CODING">ONGOING</option>
+                    <option value="BEFORE">UPCOMING</option>
+                </select>
+                <button className="btn-favourite" onClick={filterFavourites()}>Show Favourites</button>
             </div>
 
-            <div className="app-page-details">
+            {uiArray.length > 0 ? <div className="app-page">
                 {
                     uiArray.map((obj) => (
-                        <div className="app-page-details-ind" key={obj.id}>
+                        <div className="app-page-details" key={obj.id}>
                             <h3>{obj.name}</h3>
                             <p>Duration : {convertSectoMins(obj.durationSeconds)} Minutes</p>
                             <p>start time : {convertDate(obj.startTimeSeconds)}</p>
@@ -158,20 +167,20 @@ function App() {
                         </div>
                     ))
                 }
-            </div>
+            </div> : <h3>NO CONTEST FOUND!</h3>}
 
-            <div className="app-page-pagination">
+            <footer className="app-page-pagination">
                 <select id="dropdown" onChange={handlePageSizeChange}>
                     <option value="10">10</option>
                     <option value="20">20</option>
                     <option value="50">50</option>
                 </select>
-                <button onClick={previousPage}>Previous</button>
-                <button onClick={nextPage}>Next</button>
+                <button className="btn-navigate" onClick={previousPage}>Previous</button>
+                <button className="btn-navigate" onClick={nextPage}>Next</button>
                 
-            </div>
+            </footer>
             
-        </div> : <h3>NO CONTEST FOUND!</h3>}
+        </div> 
 
     </div> 
   );
