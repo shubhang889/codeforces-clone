@@ -1,6 +1,37 @@
 import "./App.css";
 import { useEffect, useState } from "react";
 import _, { debounce } from "lodash";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import { Bar } from "react-chartjs-2";
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
+const options = {
+  responsive: true,
+  plugins: {
+    legend: {
+      position: "top",
+    },
+    title: {
+      display: true,
+      text: "Duration vs Name of contest",
+    },
+  },
+};
 
 let totalContestsList = [];
 let showFav = false;
@@ -151,6 +182,16 @@ function App() {
     }
   }
 
+  let data = {
+    labels: uiArray.map((obj) => obj.name),
+    datasets: [
+      {
+        label: "Duration in seconds",
+        data: uiArray.map((obj) => obj.durationSeconds),
+        backgroundColor: "rgba(255, 99, 132, 0.5)",
+      },
+    ],
+  };
   return (
     <div className="app">
       <header className="app-header">
@@ -217,6 +258,7 @@ function App() {
                 )}
               </div>
             ))}
+            <Bar options={options} data={data} />;
           </div>
         ) : (
           <h3>NO CONTEST FOUND!</h3>
